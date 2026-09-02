@@ -1,0 +1,4 @@
+# Known-answer users for broker-auth (labuser is the real one).
+admin
+labuser
+guest

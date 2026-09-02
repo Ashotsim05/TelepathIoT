@@ -1,0 +1,10 @@
+# Low-privilege sensor: own subtree only.
+user sensor
+topic readwrite sensors/device1/#
+topic read sensors/device1/#
+
+# No #, no admin, no $SYS for sensor.
+
+user admin
+topic readwrite #
+topic read $SYS/#

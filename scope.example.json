@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "notes": "Copy to scope.json. Only hosts/ports listed here may be contacted. Labels map to the lab compose stack.",
+  "require_isolated_network": true,
+  "docker_network_name": "telepathiot-lab",
+  "session_connection_cap": 500,
+  "default_rate_limit_ms": 200,
+  "authorized_targets": [
+    {
+      "label": "broker-open",
+      "host": "127.0.0.1",
+      "port": 1883,
+      "protocol": "mqtt",
+      "notes": "Anonymous allowed, no TLS"
+    },
+    {
+      "label": "broker-auth",
+      "host": "127.0.0.1",
+      "port": 1884,
+      "protocol": "mqtt",
+      "notes": "Username/password required, no ACL"
+    },
+    {
+      "label": "broker-acl",
+      "host": "127.0.0.1",
+      "port": 1885,
+      "protocol": "mqtt",
+      "notes": "Auth + per-user ACL"
+    },
+    {
+      "label": "broker-tls",
+      "host": "127.0.0.1",
+      "port": 8883,
+      "protocol": "mqtts",
+      "notes": "TLS listener"
+    },
+    {
+      "label": "broker-tls-plaintext",
+      "host": "127.0.0.1",
+      "port": 1886,
+      "protocol": "mqtt",
+      "notes": "Deliberate misconfig: plaintext still open beside TLS"
+    }
+  ]
+}

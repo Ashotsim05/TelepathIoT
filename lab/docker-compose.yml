@@ -1,0 +1,117 @@
+# Isolated lab network — no outbound internet from containers.
+networks:
+  lab:
+    name: telepathiot-lab
+    internal: true
+    driver: bridge
+
+volumes:
+  logs-open:
+  logs-auth:
+  logs-acl:
+  logs-tls:
+
+services:
+  cert-init:
+    image: alpine/openssl:latest
+    network_mode: none
+    entrypoint: []
+    volumes:
+      - ./tls:/certs
+    working_dir: /certs
+    command:
+      - /bin/sh
+      - -c
+      - |
+        if [ ! -f /certs/ca.crt ]; then
+          openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes \
+            -keyout /certs/ca.key -out /certs/ca.crt \
+            -subj "/CN=TelepathIoT-Lab-CA"
+          openssl req -newkey rsa:2048 -nodes -keyout /certs/server.key -out /certs/server.csr \
+            -subj "/CN=broker-tls"
+          openssl x509 -req -in /certs/server.csr -CA /certs/ca.crt -CAkey /certs/ca.key \
+            -CAcreateserial -out /certs/server.crt -days 365 -sha256
+          chmod 644 /certs/server.crt /certs/ca.crt || true
+          chmod 640 /certs/server.key /certs/ca.key || true
+        fi
+
+  broker-open:
+    image: eclipse-mosquitto:2
+    networks: [lab]
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./brokers/open/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./brokers/open/data:/mosquitto/data
+      - logs-open:/mosquitto/log
+    # Host bind is for TelepathIoT on the workstation; containers still have no internet.
+
+  broker-auth:
+    image: eclipse-mosquitto:2
+    networks: [lab]
+    ports:
+      - "127.0.0.1:1884:1883"
+    volumes:
+      - ./brokers/auth/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./brokers/auth/data:/mosquitto/data
+      - logs-auth:/mosquitto/log
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        rm -f /mosquitto/config/passwd
+        mosquitto_passwd -b -c /mosquitto/config/passwd labuser labpass
+        chown mosquitto:mosquitto /mosquitto/config/passwd
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+
+  broker-acl:
+    image: eclipse-mosquitto:2
+    networks: [lab]
+    ports:
+      - "127.0.0.1:1885:1883"
+    volumes:
+      - ./brokers/acl/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./brokers/acl/acl:/mosquitto/config/acl:ro
+      - ./brokers/acl/data:/mosquitto/data
+      - logs-acl:/mosquitto/log
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        rm -f /mosquitto/config/passwd
+        mosquitto_passwd -b -c /mosquitto/config/passwd sensor sensorpass
+        mosquitto_passwd -b /mosquitto/config/passwd admin adminpass
+        chown mosquitto:mosquitto /mosquitto/config/passwd
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+
+  broker-tls:
+    image: eclipse-mosquitto:2
+    depends_on:
+      cert-init:
+        condition: service_completed_successfully
+    networks: [lab]
+    ports:
+      - "127.0.0.1:8883:8883"
+      - "127.0.0.1:1886:1883"
+    volumes:
+      - ./brokers/tls/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./tls:/certs-src:ro
+      - ./brokers/tls/data:/mosquitto/data
+      - logs-tls:/mosquitto/log
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        cp /certs-src/ca.crt /certs-src/server.crt /certs-src/server.key /mosquitto/certs/ 2>/dev/null || mkdir -p /mosquitto/certs && cp /certs-src/ca.crt /certs-src/server.crt /certs-src/server.key /mosquitto/certs/
+        chown mosquitto:mosquitto /mosquitto/certs/*
+        chmod 644 /mosquitto/certs/ca.crt /mosquitto/certs/server.crt
+        chmod 600 /mosquitto/certs/server.key
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+
+  sim-devices:
+    build:
+      context: ./sim-devices
+    networks: [lab]
+    depends_on:
+      - broker-open
+    environment:
+      MQTT_HOST: broker-open
+      MQTT_PORT: "1883"
+    restart: unless-stopped

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telepathiot"
+version = "0.0.1"
+description = "Isolated-lab MQTT broker assessment toolkit"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "paho-mqtt>=2.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+telepathiot = "telepathiot.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["telepathiot*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "tests/amqtt"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+markers = [
+  "asyncio: mark test as async",
+  "timeout: set a timeout for a test",
+]
