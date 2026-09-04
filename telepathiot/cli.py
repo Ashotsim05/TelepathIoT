@@ -244,7 +244,6 @@ def main(argv: list[str] | None = None) -> int:
 
         print(f"session={session.path}")
         print(f"findings_store={findings.path} (gitignored; secrets not printed)")
-        # Never dump secrets; module result may contain redacted handles only.
         import json
 
         print(json.dumps(result, indent=2, default=str))

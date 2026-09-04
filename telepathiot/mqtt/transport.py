@@ -115,7 +115,7 @@ def connect_both_versions(
                 detail={"protocol": name, "error": str(exc)},
                 ok=False,
             )
-        except Exception as exc:  # codec / empty
+        except Exception as exc:
             out[name] = {"error": str(exc), "accepted": False}
             session.log_action(
                 "mqtt",

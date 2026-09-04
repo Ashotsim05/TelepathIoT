@@ -6,7 +6,6 @@ FINDINGS_FILENAME = ".findings.json"
 SESSION_DIR = "sessions"
 ACTION_LOG_NAME = "actions.log"
 
-# MQTT packet types
 PKT_CONNECT = 1
 PKT_CONNACK = 2
 PKT_PUBLISH = 3

@@ -54,7 +54,7 @@ Protocol notes that affect results:
 ## Installation
 
 ```bash
-git clone https://github.com/Ashotsim05/TelepathIoT.git
+git clone <repository-url>
 cd TelepathIoT
 python -m pip install -e ".[dev]"
 copy scope.example.json scope.json   # Windows
@@ -67,21 +67,24 @@ Edit `scope.json` so it lists only brokers you are authorized to test. The examp
 
 ```bash
 cd lab
+copy .env.example .env
+docker compose pull
 docker compose up --build -d
 cd ..
+copy scope.example.json scope.json
+python -m pip install -e ".[dev]"
 python -m telepathiot verify-env
 ```
 
-`verify-env` inspects `telepathiot-lab` and refuses to proceed if the network is not internal.
+Populate every value in `lab/.env` with lab-only credentials before starting the stack. The file is ignored by Git and must not contain production or personal credentials.
 
-| Service | Host bind | Known-answer behavior |
-| --- | --- | --- |
-| `broker-open` | `127.0.0.1:1883` | Anonymous connect allowed; `$SYS` metadata; live sim topics |
-| `broker-auth` | `127.0.0.1:1884` | Anonymous rejected; planted user `labuser` / `labpass` |
-| `broker-acl` | `127.0.0.1:1885` | User `sensor` cannot subscribe to `#` or `admin/#` |
-| `broker-tls` | `127.0.0.1:8883` | TLS listener (lab CA) |
-| `broker-tls-plaintext` | `127.0.0.1:1886` | Deliberate misconfig: plaintext still open beside TLS |
-| `sim-devices` | internal only | Temperature, GPS, retained honeypot `admin/token` |
+| Container    | Host port      | Known answer                                      |
+|--------------|----------------|---------------------------------------------------|
+| broker-open  | 127.0.0.1:1883 | anonymous = true, `$SYS` leak, sim topics         |
+| broker-auth  | 127.0.0.1:1884 | anonymous = false; local credentials required      |
+| broker-acl   | 127.0.0.1:1885 | local ACL credential may not subscribe to `#` or `admin/#` |
+| broker-tls   | 127.0.0.1:8883 | TLS; plaintext still on 1886 (deliberate misconfig)|
+| sim-devices  | (internal)     | retained honeypot `admin/token` on broker-open    |
 
 Confirm each listener with Mosquitto clients before trusting TelepathIoT output.
 
@@ -100,6 +103,11 @@ Recon and topic discovery (passive / read-mostly):
 python -m telepathiot recon --target broker-open
 python -m telepathiot recon --target broker-auth
 python -m telepathiot topics --target broker-open
+python -m telepathiot topics --target broker-acl
+
+python -m telepathiot snapshot --name pre-brute --lab-dir lab
+python -m telepathiot bruteforce --target broker-auth --users <authorized-users-file> --passwords <authorized-passwords-file> --i-confirm-intrusive
+python -m telepathiot acl --target broker-acl --username <authorized-username> --password <authorized-password> --i-confirm-intrusive
 python -m telepathiot tls --target broker-tls
 ```
 
@@ -108,12 +116,12 @@ Intrusive modules (human gate required):
 ```bash
 python -m telepathiot snapshot --name pre-brute --lab-dir lab
 python -m telepathiot bruteforce --target broker-auth \
-  --users lab/wordlists/users.txt \
-  --passwords lab/wordlists/passwords.txt \
+  --users <authorized-users-file> \
+  --passwords <authorized-passwords-file> \
   --i-confirm-intrusive
 
 python -m telepathiot acl --target broker-acl \
-  --username sensor --password sensorpass \
+  --username <authorized-username> --password <authorized-password> \
   --i-confirm-intrusive
 ```
 

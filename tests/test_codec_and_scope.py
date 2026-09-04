@@ -100,8 +100,8 @@ def test_canonicalize_localhost() -> None:
 
 
 def test_redact_stable() -> None:
-    a = redact_value("labpass")
-    b = redact_value("labpass")
+    a = redact_value("test-value")
+    b = redact_value("test-value")
     assert a == b
-    assert "labpass" not in a
+    assert "test-value" not in a
     assert a.startswith("[REDACTED:")

@@ -11,7 +11,6 @@ import paho.mqtt.client as mqtt
 
 HOST = os.environ.get("MQTT_HOST", "broker-open")
 PORT = int(os.environ.get("MQTT_PORT", "1883"))
-# Deliberate honeypot retained topic for known-answer topic discovery.
 HONEYPOT_TOPIC = "admin/token"
 HONEYPOT_PAYLOAD = "lab-only-fake-token-do-not-reuse"
 

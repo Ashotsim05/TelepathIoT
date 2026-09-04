@@ -192,24 +192,23 @@ def _parse_properties(buf: bytes, pos: int) -> tuple[dict[str, Any], int]:
     while pos < end:
         ident = buf[pos]
         pos += 1
-        if ident == 0x1F:  # Reason String
+        if ident == 0x1F:
             s, pos = read_utf8(buf, pos)
             props["reason_string"] = s
-        elif ident == 0x15:  # Authentication Method
+        elif ident == 0x15:
             s, pos = read_utf8(buf, pos)
             props["authentication_method"] = s
-        elif ident == 0x16:  # Authentication Data
+        elif ident == 0x16:
             if pos + 2 > len(buf):
                 break
             (n,) = struct.unpack_from("!H", buf, pos)
             pos += 2 + n
             props["authentication_data_len"] = n
-        elif ident == 0x26:  # User Property
+        elif ident == 0x26:
             k, pos = read_utf8(buf, pos)
             v, pos = read_utf8(buf, pos)
             props.setdefault("user_properties", []).append({"key": k, "value": v})
         else:
-            # Skip unknown single-byte or give up remaining
             break
     return props, pos
 

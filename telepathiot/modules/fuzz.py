@@ -106,7 +106,6 @@ def run_fuzz(
         session.note_connection()
         cid = random_client_id()
         connect = _qos2_partial(cid)
-        # PUBREC packet type 5, flags 0, remaining 2, packet id 1 — without a matching PUBLISH/PUBCOMP.
         pubrec = b"\x50\x02\x00\x01"
         session.log_action("fuzz", "qos2_partial_handshake", target=target.key, detail={"opt_in": True})
         _send(target.host, target.port, connect + pubrec)

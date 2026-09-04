@@ -39,7 +39,6 @@ def assert_isolated(name: str) -> dict[str, Any]:
     options = info.get("Options") or {}
     internal = info.get("Internal")
     if internal is not True and options.get("com.docker.network.bridge.enable_ip_masquerade") == "true":
-        # Internal flag is the authoritative compose setting we require.
         pass
     if internal is not True:
         raise IsolationError(

@@ -11,7 +11,6 @@ import paho.mqtt.client as mqtt
 from telepathiot.constants import CLIENT_ID_PREFIX, DEFAULT_CONNECT_TIMEOUT, DEFAULT_KEEPALIVE
 from telepathiot.session import Session
 
-# paho-mqtt 2.x callback API
 _CB = getattr(mqtt, "CallbackAPIVersion", None)
 
 

@@ -1,4 +1,3 @@
-# Isolated lab network — no outbound internet from containers.
 networks:
   lab:
     name: telepathiot-lab
@@ -44,8 +43,6 @@ services:
       - ./brokers/open/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./brokers/open/data:/mosquitto/data
       - logs-open:/mosquitto/log
-    # Host bind is for TelepathIoT on the workstation; containers still have no internet.
-
   broker-auth:
     image: eclipse-mosquitto:2
     networks: [lab]
@@ -59,7 +56,7 @@ services:
     command:
       - |
         rm -f /mosquitto/config/passwd
-        mosquitto_passwd -b -c /mosquitto/config/passwd labuser labpass
+        mosquitto_passwd -b -c /mosquitto/config/passwd "${AUTH_USERNAME:?AUTH_USERNAME must be set}" "${AUTH_PASSWORD:?AUTH_PASSWORD must be set}"
         chown mosquitto:mosquitto /mosquitto/config/passwd
         exec mosquitto -c /mosquitto/config/mosquitto.conf
 
@@ -77,8 +74,8 @@ services:
     command:
       - |
         rm -f /mosquitto/config/passwd
-        mosquitto_passwd -b -c /mosquitto/config/passwd sensor sensorpass
-        mosquitto_passwd -b /mosquitto/config/passwd admin adminpass
+        mosquitto_passwd -b -c /mosquitto/config/passwd "${SENSOR_USERNAME:?SENSOR_USERNAME must be set}" "${SENSOR_PASSWORD:?SENSOR_PASSWORD must be set}"
+        mosquitto_passwd -b /mosquitto/config/passwd "${ADMIN_USERNAME:?ADMIN_USERNAME must be set}" "${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set}"
         chown mosquitto:mosquitto /mosquitto/config/passwd
         exec mosquitto -c /mosquitto/config/mosquitto.conf
 

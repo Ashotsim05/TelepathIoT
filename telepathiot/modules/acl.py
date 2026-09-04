@@ -89,7 +89,6 @@ def run_acl(
             pub_status = "connect_denied"
         elif pub.connected:
             pub_status = "publish_attempted"
-            # QoS0 has no PUBACK; treat successful connect+publish call as attempted, not proof of delivery.
             if "#" in topic or "+" in topic:
                 pub_status = "publish_skipped_wildcard"
 

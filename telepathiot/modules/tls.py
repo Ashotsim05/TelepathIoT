@@ -9,7 +9,6 @@ from telepathiot.mqtt.transport import probe_port
 from telepathiot.scope import AuthorizedTarget, Scope
 from telepathiot.session import Session
 
-# Representative TLS 1.2/1.3 suites to probe; not an exhaustive attack list.
 PROBE_CIPHERS = [
     "TLS_AES_256_GCM_SHA384",
     "TLS_AES_128_GCM_SHA256",
@@ -103,7 +102,6 @@ def run_tls(
 
     check_port = plaintext_port
     if check_port is None:
-        # Common misconfig: plaintext still bound. Prefer a scoped sibling, else 1883.
         sibling = scope.find(host, 1886) or scope.find(host, 1883)
         check_port = sibling.port if sibling else 1883
 
