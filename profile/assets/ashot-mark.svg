@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Ashot Simonyan personal cybersecurity mark</title>
+  <desc id="desc">A cyan A monogram with a shield-inspired negative space and circuit traces.</desc>
+  <defs>
+    <linearGradient id="cyan" x1="32" y1="24" x2="224" y2="232" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7CF7FF"/>
+      <stop offset=".48" stop-color="#29C7D0"/>
+      <stop offset="1" stop-color="#087B89"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" rx="44" fill="#0D1117"/>
+  <rect x="12" y="12" width="232" height="232" rx="34" fill="none" stroke="#263141" stroke-width="2"/>
+  <g fill="none" stroke="#39D0D8" stroke-width="3" opacity=".65">
+    <path d="M28 81h33l13 13"/><path d="M28 175h33l13-13"/>
+    <path d="M228 81h-33l-13 13"/><path d="M228 175h-33l-13-13"/>
+    <circle cx="28" cy="81" r="4" fill="#39D0D8"/><circle cx="28" cy="175" r="4" fill="#39D0D8"/>
+    <circle cx="228" cy="81" r="4" fill="#39D0D8"/><circle cx="228" cy="175" r="4" fill="#39D0D8"/>
+  </g>
+  <path d="M128 35 57 207h33l15-39h46l15 39h33L128 35Zm0 69 12 35h-24l12-35Z" fill="url(#cyan)" filter="url(#glow)"/>
+  <path d="M128 108c13 9 24 8 24 8v23c0 20-13 33-24 39-11-6-24-19-24-39v-23s11 1 24-8Z" fill="#0D1117" stroke="#7CF7FF" stroke-width="3"/>
+  <path d="M119 141l7 7 13-17" fill="none" stroke="#39D0D8" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+</svg>
